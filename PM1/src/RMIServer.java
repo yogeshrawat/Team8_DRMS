@@ -3,10 +3,17 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class RMIServer implements RMInterface {
 
+	private static HashMap<Character, ArrayList<Student>> Studentindex = new HashMap<Character, ArrayList<Student>>();
+	private HashMap<String, Book> books   = new HashMap<String, Book>();
+	private String instituteName;
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try
@@ -21,19 +28,37 @@ public class RMIServer implements RMInterface {
 	}
 
 	@Override
-	public String createAccount(String m_firstName, String m_lastName,
+	public boolean createAccount(String m_firstName, String m_lastName,
 			String m_emailAddress, String m_phoneNumber, String m_username,
 			String m_password, String m_educationalInstitution)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+			throws RemoteException
+	{
+		Student objstudent = new Student(m_username,m_password,m_educationalInstitution);
+		objstudent.setFirstName(m_firstName);
+		objstudent.setLastName(m_lastName);
+		objstudent.setEmailAddress(m_emailAddress);
+		objstudent.setPhoneNumber(m_phoneNumber);
+		
+		synchronized(Studentindex) {
+			ArrayList<Student> newStudent = Studentindex.get(m_username.charAt(0));
+			if(newStudent == null) {
+				newStudent = new ArrayList<Student>();
+				Studentindex.put(m_username.charAt(0), newStudent);
+			}
+			newStudent.add(objstudent);
+		}
+		return true;
 	}
 
 	@Override
-	public String reserveBook(String m_username, String m_password,
+	public boolean reserveBook(String m_username, String m_password,
 			String m_bookName, String m_author) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		String reverip = "";
+		for (int i=0; i< m_username.length();i++)
+		{
+			reverip = reverip + m_username.charAt((m_username.length()-1)-i);
+		}
+		return true;
 	}
 
 	@Override
@@ -51,9 +76,9 @@ public class RMIServer implements RMInterface {
 	
 	public void exportServer() throws Exception
 	{
-		Remote objRemote = UnicastRemoteObject.exportObject(this,2020);
-		Registry r = LocateRegistry.createRegistry(2020);
-		r.bind("test",objRemote);
+		Remote objremote1 = UnicastRemoteObject.exportObject(this,2020);
+		Registry registry1 = LocateRegistry.createRegistry(2020);
+		registry1.bind("Institution", objremote1);
 	}
 
 }
