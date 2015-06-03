@@ -1,3 +1,4 @@
+package rmi.Server;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -5,6 +6,10 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import rmi.Interface.RMInterface;
+import rmi.LibraryObjects.Book;
+import rmi.LibraryObjects.Student;
 
 
 public class RMIServer implements RMInterface {

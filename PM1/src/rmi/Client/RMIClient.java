@@ -1,10 +1,14 @@
+package rmi.Client;
 import java.io.*;
 import java.rmi.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
+
 import javax.management.remote.rmi.RMIIIOPServerImpl;
+
+import rmi.Interface.RMInterface;
 
 public class RMIClient{
 

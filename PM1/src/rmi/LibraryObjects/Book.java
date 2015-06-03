@@ -1,3 +1,4 @@
+package rmi.LibraryObjects;
 public class Book 
 {
 	private String name;
