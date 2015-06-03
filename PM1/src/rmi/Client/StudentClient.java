@@ -8,13 +8,13 @@ import java.util.logging.Logger;
 
 import javax.management.remote.rmi.RMIIIOPServerImpl;
 
-import rmi.Interface.RMInterface;
+import rmi.Interface.StudentInterface;
 
-public class RMIClient{
+public class StudentClient{
 
-	static RMInterface ConcordiaServer;
-	static RMInterface OttawaServer;
-	static RMInterface WaterlooServer;
+	static StudentInterface ConcordiaServer;
+	static StudentInterface OttawaServer;
+	static StudentInterface WaterlooServer;
 	static final String Concordia ="concordia", Ottawa="ottawa", Waterloo="waterloo";
 	static final String Institution = "Institution";
 	protected static String instituteName;
@@ -32,13 +32,13 @@ public class RMIClient{
 	//To intialize server
 	public void InitializeServer() throws Exception {
 		System.setSecurityManager(new RMISecurityManager());
-		ConcordiaServer = (RMInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);		
-		OttawaServer = (RMInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);
-		WaterlooServer = (RMInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);	
+		ConcordiaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);		
+		OttawaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);
+		WaterlooServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);	
 	}
 
 	//Get Server Connection
-	public static RMInterface LocateServer(String instituteName) {
+	public static StudentInterface LocateServer(String instituteName) {
 		if(instituteName.equals(Concordia)) {
 			return ConcordiaServer;
 		}
@@ -70,10 +70,10 @@ public class RMIClient{
 		return userInput;
 	}
 
-	public RMInterface ServerValidation(Scanner keyboard)
+	public StudentInterface ServerValidation(Scanner keyboard)
 	{
 		Boolean valid = false;
-		RMInterface server = null;
+		StudentInterface server = null;
 		System.out.println("Enter Institute Name");
 		System.out.println("'concordia' For Concordia University");
 		System.out.println("'ottawa' For Ottawa University");
@@ -106,10 +106,10 @@ public class RMIClient{
 	{
 		try{
 			
-			RMIClient objClient = new RMIClient();
+			StudentClient objClient = new StudentClient();
 			//initialize the connections to registry
 			objClient.InitializeServer();
-			RMInterface objServer = null;
+			StudentInterface objServer = null;
 			Scanner keyboard = new Scanner(System.in);
 			//to which server you want to connect
 			objServer = objClient.ServerValidation(keyboard);

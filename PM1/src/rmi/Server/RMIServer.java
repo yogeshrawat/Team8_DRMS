@@ -7,12 +7,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import rmi.Interface.RMInterface;
+import rmi.Interface.AdminInterface;
+import rmi.Interface.StudentInterface;
 import rmi.LibraryObjects.Book;
 import rmi.LibraryObjects.Student;
 
 
-public class RMIServer implements RMInterface {
+public class RMIServer implements StudentInterface, AdminInterface {
 
 	private static HashMap<Character, ArrayList<Student>> Studentindex = new HashMap<Character, ArrayList<Student>>();
 	private HashMap<String, Book> books   = new HashMap<String, Book>();
@@ -84,6 +85,13 @@ public class RMIServer implements RMInterface {
 		Remote objremote1 = UnicastRemoteObject.exportObject(this,2020);
 		Registry registry1 = LocateRegistry.createRegistry(2020);
 		registry1.bind("Institution", objremote1);
+	}
+
+	@Override
+	public String getNonReturners(String AdminUsername, String strPassword,
+			String InstitutionName, int NumDays) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
