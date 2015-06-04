@@ -3,6 +3,9 @@ package rmi.Client;
 import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
 import java.util.Scanner;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import rmi.Interface.StudentInterface;
 
@@ -14,6 +17,20 @@ public class Client {
 	static final String Concordia ="concordia", Ottawa="ottawa", Waterloo="waterloo";
 	static final String Institution = "Institution";
 	protected static String instituteName;
+	protected Logger logger;
+
+	public void setLogger(String username, String fileName) {
+		try{
+			this.logger = Logger.getLogger(username);
+			FileHandler fileTxt 	 = new FileHandler(fileName);
+			SimpleFormatter formatterTxt = new SimpleFormatter();
+		    fileTxt.setFormatter(formatterTxt);
+		    logger.addHandler(fileTxt);
+		}
+		catch(Exception err) {
+			System.out.println("Couldn't create Logger. Please check file permission");
+		}
+	}
 	
 	public void InitializeServer() throws Exception {
 		System.setSecurityManager(new RMISecurityManager());

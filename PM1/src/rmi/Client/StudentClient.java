@@ -38,6 +38,7 @@ public class StudentClient extends Client{
 			objServer = objClient.ServerValidation(keyboard);
 			Integer userInput = 0;
 			showMenu();
+
 			userInput = Integer.parseInt(objClient.InputStringValidation(keyboard));
 			String userName, password, institution;
 			boolean success = false;
@@ -64,10 +65,13 @@ public class StudentClient extends Client{
 					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, instituteName);
 					if(success){
 						System.out.println("Success");
-						//logger method for success
+						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						objClient.logger.info("Account created successfully for user "+userName);
+
 					}
 					else{
-						// logger method for failure
+						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						objClient.logger.info("Account could not be created for : "+userName);
 					}
 					showMenu();
 					break;
@@ -83,10 +87,14 @@ public class StudentClient extends Client{
 					success = objServer.reserveBook(userName, password, bookName, authorName);
 					if(success){
 						System.out.println("Success");
-						//logger method for success
+						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						objClient.logger.info("Account created successfully for user "+userName);
+
 					}
 					else{
-						// logger method for failure
+						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						objClient.logger.info("Account could not be created for : "+userName);
+
 					}
 					showMenu();
 					break;

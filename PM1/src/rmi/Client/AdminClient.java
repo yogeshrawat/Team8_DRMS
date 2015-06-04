@@ -32,8 +32,11 @@ public class AdminClient extends Client {
 			objServer = (AdminInterface) objClient.ServerValidation(keyboard);
 			Integer userInput = 0;
 			showMenu();
+			objClient.setLogger("admin", "logs/admin.txt");
+			objClient.logger.info("admin login");
+
 			userInput = Integer.parseInt(objClient.InputStringValidation(keyboard));
-			String userName, password, institution;
+			String userName, password;
 			boolean success = false;
 
 			while(true)
@@ -43,13 +46,16 @@ public class AdminClient extends Client {
 				case 1: 
 					System.out.println("User Name: ");
 					userName = objClient.InputStringValidation(keyboard);
-					System.out.println("Pass: ");
+					System.out.println("Password: ");
 					password = objClient.InputStringValidation(keyboard);
 					System.out.println("No Of Days: ");
 					int numOfDays = objClient.InputIntValidation(keyboard);
 					//TODO what to do with institute name
+					
+					objClient.logger.info("Non Returner retrieved on :"+ System.currentTimeMillis());
 					objServer.getNonReturners(userName, password, objServer.toString(), numOfDays);
-					objClient.showMenu();
+
+					showMenu();
 					break;
 				case 2:
 					System.out.println("Have a nice day!");
