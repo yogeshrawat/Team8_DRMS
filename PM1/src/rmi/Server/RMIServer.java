@@ -1,4 +1,8 @@
 package rmi.Server;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,21 +26,92 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	//private static ArrayList<List<Student>> listStudents = new ArrayList<List<Student>>(); 
 	private HashMap<String, Book> tableBooks   = new HashMap<String, Book>();
 	private String instituteName;
+	private int udpPort;
+	private static ArrayList<RMIServer> LibraryServers;
 
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		try
-		{
-			(new RMIServer()).exportServer();
-			System.out.println("Server is up and running!");
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+	public int getUDPPort()
+	{
+		return this.udpPort;
+	}
+	public RMIServer(String strInstitution, int iPortNum) {
+		// TODO Auto-generated constructor stub
+		instituteName = strInstitution;
+		udpPort = iPortNum;
+		//this.setlogger(//LogFilePath);
 	}
 
+	public static void main(String[] args) throws RemoteException, AlreadyBoundException {
+		
+		// TODO Auto-generated method stub
+		int rmiRegistryPort = 1099;
+		Registry rmiRegistry = LocateRegistry.createRegistry(rmiRegistryPort);
+		
+		RMIServer Server1 = new RMIServer("Concordia",50001);
+		RMIServer Server2 = new RMIServer("Ottawa",50002);
+		RMIServer Server3 = new RMIServer("Waterloo",50003);
+		
+		Remote objremote1 = UnicastRemoteObject.exportObject(Server1,rmiRegistryPort);
+		rmiRegistry.bind("Concordia", objremote1);
+		
+		Remote objremote2 = UnicastRemoteObject.exportObject(Server1,rmiRegistryPort);
+		rmiRegistry.bind("Ottawa", objremote2);
+		
+		Remote objremote3 = UnicastRemoteObject.exportObject(Server1,rmiRegistryPort);
+		rmiRegistry.bind("Waterloo", objremote3);
+		
+		Server1.start();
+		Server2.start();
+		Server3.start();
+		
+		LibraryServers.add(Server1);
+		LibraryServers.add(Server2);
+		LibraryServers.add(Server3);
+		
+//		try
+//		{
+//			(new RMIServer()).exportServer();
+//			System.out.println("Server is up and running!");
+//			
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+		
+		
+		
+	}
+
+	public void run()
+	{
+		DatagramSocket socket = null;
+		
+		try
+		{
+			socket = new DatagramSocket(this.udpPort);
+			byte[] msg = new byte[10000];
+			//Logger call
+			
+			while(true)
+			{
+				DatagramPacket request = new DatagramPacket(msg, msg.length);
+				socket.receive(request);
+				String data = new String(request.getData());
+				String response = GetNonReturnersByServer(Integer.parseInt(data.trim()));
+				DatagramPacket reply = new DatagramPacket(response.getBytes(),response.length(),request.getAddress(),request.getPort());
+				socket.send(reply);
+			}
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		finally
+		{
+			socket.close();
+		}
+	}
+	
 	@Override
 	public boolean createAccount(String strFirstName, String strLastName, String strEmailAddress, String strPhoneNumber, String strUsername,
 			String strPassword, String strEducationalInstitution)
@@ -154,11 +229,53 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	@Override
 	public String getNonReturners(String AdminUsername, String AdminPassword,String InstitutionName, int NumDays) throws RemoteException 
 	{
+		String response = null;
+		if(AdminUsername.equalsIgnoreCase("admin")&&AdminPassword.equals("admin"))
+		{
+			response += GetNonReturnersByServer(NumDays);
+			for(RMIServer Server : LibraryServers)
+			{
+				synchronized(Server)
+				{
+					if(!Server.instituteName.equals(this.instituteName))
+					{
+						DatagramSocket socket = null;
+						try
+						{
+							socket = new DatagramSocket();
+							byte[] msgOut = (""+NumDays).getBytes();
+							InetAddress host = InetAddress.getByName("localhost");
+							int ServerPort = Server.getUDPPort();
+							DatagramPacket request = new DatagramPacket(msgOut, (""+NumDays).length(),host,ServerPort);
+							socket.send(request);
+							
+							byte[] msgIn = new byte[10000];
+							DatagramPacket reply = new DatagramPacket(msgIn, msgIn.length);
+							socket.receive(reply);
+							response+=new String(reply.getData());
+						}
+						catch(Exception ex)
+						{
+							ex.printStackTrace();
+						}
+						finally
+						{
+							socket.close();
+						}
+					}
+				}
+			}
+		}
+		else
+			System.out.println("Invalid Login");
+		return response;
+	}
+
+	private String GetNonReturnersByServer(int NumDays)
+	{
 		StringBuilder sbStudentList = null;
 		sbStudentList.append(instituteName+": \n");
 		// TODO Auto-generated method stub
-		if(AdminUsername.equalsIgnoreCase("admin")&&AdminPassword.equals("admin"))
-		{
 			Iterator<?> it = tableStudents.entrySet().iterator();
 			while(it.hasNext())
 			{
@@ -184,10 +301,9 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 					}
 				}
 			}
-		}
-		return null;
+		return sbStudentList.toString();
 	}
-
+	
 	private Student getStudent(String strUserName)
 	{
 		Student objStudent = null;
