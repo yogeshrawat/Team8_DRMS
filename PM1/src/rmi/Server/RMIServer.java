@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -18,6 +19,10 @@ import rmi.Interface.AdminInterface;
 import rmi.Interface.StudentInterface;
 import rmi.LibraryObjects.Book;
 import rmi.LibraryObjects.Student;
+import java.util.logging.FileHandler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 
 public class RMIServer extends Thread implements StudentInterface, AdminInterface {
@@ -28,7 +33,34 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	private String instituteName;
 	private int udpPort;
 	private static ArrayList<RMIServer> LibraryServers;
+	
+	private Logger logger;
+	
+	public RMIServer(String instituteName)
+	{
+		this.instituteName = instituteName;
+		this.setLogger("logs/library/"+instituteName+".txt");
+	}
+	
+	public RMIServer(){
+		
+	}
+	
+	private void setLogger(String instituteName) {
+		try{
+			this.logger = Logger.getLogger(this.instituteName);
+			FileHandler fileTxt 	 = new FileHandler(instituteName);
+			SimpleFormatter formatterTxt = new SimpleFormatter();
+		    fileTxt.setFormatter(formatterTxt);
+		    logger.addHandler(fileTxt);
+		}
+		catch(Exception err) {
+			System.out.println("Couldn't Initiate Logger. Please check file permission");
+		}
+	}
 
+	
+	
 	public int getUDPPort()
 	{
 		return this.udpPort;
@@ -131,6 +163,8 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 				tableStudents.put(strUsername.charAt(0), objNewStudent);
 			}
 			objNewStudent.add(objStudent);
+			logger.info("New User added to the library with username as : "+objStudent.getUserName());
+
 		}
 		return true;
 	}
@@ -158,6 +192,8 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 							objBook.setNumOfCopy(objBook.getNumOfCopy()-1);//Decrement available copies
 							(objStudent.getReservedBooks()).put(objBook,14);//Add Book to Student's reserved list for 14 days
 							success = true;
+							logger.info(strUsername+": Reserved the book "+strBookName+"\n. Remaining copies of"+ strBookName+"is/are"+objBook.getNumOfCopy());
+
 						}
 						else
 						{
