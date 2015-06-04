@@ -15,30 +15,30 @@ public class StudentClient{
 	static StudentInterface ConcordiaServer;
 	static StudentInterface OttawaServer;
 	static StudentInterface WaterlooServer;
-	static final String Concordia ="concordia", Ottawa="ottawa", Waterloo="waterloo";
-	static final String Institution = "Institution";
-	protected static String instituteName;
+	
+	static final String Concordia ="Concordia", Ottawa="Ottawa", Waterloo="Waterloo";
+	protected String instituteName;
 	
 	//Menu to display actions that are need to perform by student
 	public static void showMenu()
 	{
 		System.out.println("DRMS Student Client System \n");
 		System.out.println("Please select an option");
-		System.out.println("1. Create An Account.");
-		System.out.println("2. Reserve a Book");
+		System.out.println("1. Create new student account.");
+		System.out.println("2. Reserve a book");
 		System.out.println("3. Exit");
 	}
 
-	//To intialize server
-	public void InitializeServer() throws Exception {
+	//To lookup server
+	public void registryLookup() throws Exception {
 		System.setSecurityManager(new RMISecurityManager());
-		ConcordiaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);		
-		OttawaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);
-		WaterlooServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);	
+		ConcordiaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:1099/"+Concordia);		
+		OttawaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:1099/"+Ottawa);
+		WaterlooServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:1099/"+Waterloo);	
 	}
 
 	//Get Server Connection
-	public static StudentInterface LocateServer(String instituteName) {
+	public StudentInterface locateServer(String instituteName) {
 		if(instituteName.equals(Concordia)) {
 			return ConcordiaServer;
 		}
@@ -70,19 +70,19 @@ public class StudentClient{
 		return userInput;
 	}
 
-	public StudentInterface ServerValidation(Scanner keyboard)
+	public StudentInterface getServer(Scanner keyboard)
 	{
 		Boolean valid = false;
 		StudentInterface server = null;
 		System.out.println("Enter Institute Name");
-		System.out.println("'concordia' For Concordia University");
-		System.out.println("'ottawa' For Ottawa University");
-		System.out.println("'waterloo' For Waterloo University");
+		System.out.println("'Concordia' For Concordia University");
+		System.out.println("'Ottawa' For Ottawa University");
+		System.out.println("'Waterloo' For Waterloo University");
 		while(!valid)
 		{
 			try{
 				instituteName = keyboard.nextLine();
-				server = LocateServer(instituteName);
+				server = locateServer(instituteName);
 				if(server != null) {
 					valid=true;
 				}
@@ -107,20 +107,20 @@ public class StudentClient{
 		try{
 			
 			StudentClient objClient = new StudentClient();
-			//initialize the connections to registry
-			objClient.InitializeServer();
+			objClient.registryLookup();   //rmi registry lookup
 			StudentInterface objServer = null;
-			Scanner keyboard = new Scanner(System.in);
-			//to which server you want to connect
-			objServer = objClient.ServerValidation(keyboard);
+			
 			Integer userInput = 0;
+			Scanner keyboard = new Scanner(System.in);
+			
+			//to which server you want to connect
+			objServer = objClient.getServer(keyboard);
 			showMenu();
-			userInput = Integer.parseInt(objClient.InputStringValidation(keyboard));
 			String userName, password, institution;
 			boolean success = false;
-
 			while(true)
 			{
+				userInput = Integer.parseInt(objClient.InputStringValidation(keyboard));
 				switch(userInput)
 				{
 				case 1: 
@@ -136,9 +136,7 @@ public class StudentClient{
 					userName = objClient.InputStringValidation(keyboard);
 					System.out.println("Password: ");
 					password = objClient.InputStringValidation(keyboard);
-					System.out.println("Institution Name: ");
-					institution= objClient.InputStringValidation(keyboard);
-					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, instituteName);
+					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, objClient.instituteName);
 					if(success){
 						System.out.println("Success");
 						//logger method for success
@@ -168,8 +166,9 @@ public class StudentClient{
 					showMenu();
 					break;
 				case 3: 
-					showMenu();
-					break;
+					System.out.println("Thank you");
+					keyboard.close();
+					System.exit(0);
 				case 4: 
 					showMenu();
 					break;
