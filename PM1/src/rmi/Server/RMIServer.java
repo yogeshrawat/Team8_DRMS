@@ -6,6 +6,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import rmi.Interface.AdminInterface;
 import rmi.Interface.StudentInterface;
@@ -13,13 +16,14 @@ import rmi.LibraryObjects.Book;
 import rmi.LibraryObjects.Student;
 
 
-public class RMIServer implements StudentInterface, AdminInterface {
+public class RMIServer extends Thread implements StudentInterface, AdminInterface {
 
-	private static HashMap<Character, ArrayList<Student>> Studentindex = new HashMap<Character, ArrayList<Student>>();
-	private HashMap<String, Book> books   = new HashMap<String, Book>();
+	private static HashMap<Character, ArrayList<Student>> tableStudents = new HashMap<Character, ArrayList<Student>>();
+	//private static ArrayList<List<Student>> listStudents = new ArrayList<List<Student>>(); 
+	private HashMap<String, Book> tableBooks   = new HashMap<String, Book>();
 	private String instituteName;
-	
-	
+
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try
@@ -34,52 +38,112 @@ public class RMIServer implements StudentInterface, AdminInterface {
 	}
 
 	@Override
-	public boolean createAccount(String m_firstName, String m_lastName,
-			String m_emailAddress, String m_phoneNumber, String m_username,
-			String m_password, String m_educationalInstitution)
-			throws RemoteException
+	public boolean createAccount(String strFirstName, String strLastName, String strEmailAddress, String strPhoneNumber, String strUsername,
+			String strPassword, String strEducationalInstitution)
+					throws RemoteException
 	{
-		Student objstudent = new Student(m_username,m_password,m_educationalInstitution);
-		objstudent.setFirstName(m_firstName);
-		objstudent.setLastName(m_lastName);
-		objstudent.setEmailAddress(m_emailAddress);
-		objstudent.setPhoneNumber(m_phoneNumber);
-		
-		synchronized(Studentindex) {
-			ArrayList<Student> newStudent = Studentindex.get(m_username.charAt(0));
-			if(newStudent == null) {
-				newStudent = new ArrayList<Student>();
-				Studentindex.put(m_username.charAt(0), newStudent);
+		Student objStudent = new Student(strUsername,strPassword,strEducationalInstitution);
+		objStudent.setFirstName(strFirstName);
+		objStudent.setLastName(strLastName);
+		objStudent.setEmailAddress(strEmailAddress);
+		objStudent.setPhoneNumber(strPhoneNumber);
+
+		//Add student to HashTable 'tableStudents' with Lock
+		synchronized(tableStudents) {
+			ArrayList<Student> objNewStudent = tableStudents.get(strUsername.charAt(0));
+			if(objNewStudent == null) {
+				objNewStudent = new ArrayList<Student>();
+				tableStudents.put(strUsername.charAt(0), objNewStudent);
 			}
-			newStudent.add(objstudent);
+			objNewStudent.add(objStudent);
 		}
 		return true;
 	}
 
 	@Override
-	public boolean reserveBook(String m_username, String m_password,
-			String m_bookName, String m_author) throws RemoteException {
-		String reverip = "";
-		for (int i=0; i< m_username.length();i++)
+	public boolean reserveBook(String strUsername, String strPassword, String strBookName, String strAuthor) throws RemoteException 
+	{
+		boolean success =false;
+		int iLoginResult = 0;
+		Student objStudent = null;
+		objStudent = getStudent(strUsername);
+		if(objStudent!=null)
 		{
-			reverip = reverip + m_username.charAt((m_username.length()-1)-i);
+			iLoginResult = checkUser(strUsername, strPassword, objStudent.getInst());
+			if(iLoginResult==1)
+			{
+				synchronized(tableBooks)
+				{
+					Book objBook = tableBooks.get(strBookName);
+					if(objBook!= null)
+					{
+						//reserve the book
+						if(objBook.getNumOfCopy()>0)
+						{
+							objBook.setNumOfCopy(objBook.getNumOfCopy()-1);//Decrement available copies
+							(objStudent.getReservedBooks()).put(objBook,14);//Add Book to Student's reserved list for 14 days
+							success = true;
+						}
+						else
+						{
+							System.out.println("Required book not available currently");
+						}
+					}
+					else
+					{
+						System.out.println("Required book not found");	
+					}
+				}
+			}
+			else
+			{
+				if(iLoginResult==2)
+					System.out.println("Login is invalid!");
+			}
 		}
-		return true;
+		else
+		{
+			System.out.println("Student "+strUsername+ " does not exist!");
+		}
+		return success;
 	}
 
 	@Override
-	public String checkUser(String m_username, String m_password,
-			String m_educationalInstitution) throws RemoteException {
+	public int checkUser(String strUsername, String strPassword,String strEducationalInstitution) throws RemoteException 
+	{
 		// TODO Auto-generated method stub
-		return "true";
+		int login = 0;
+		Student objStudent = null;
+		ArrayList<Student> listStudent = tableStudents.get(strUsername.charAt(0));
+		if(listStudent.size()>0)
+		{
+			for(Student student : listStudent)
+			{
+				if(student.getUserName().equals(strUsername))
+				{
+					if(student.getPassword().equals(strPassword))
+					{
+						login =1;
+					}
+					else
+					{
+						login = 2;
+					}
+				}
+			}
+		}
+
+		return login;
 	}
 
-	@Override
-	public String searchBook(String m_bookName) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+	//@Override
+	//	public String searchBook(String strBookName) throws RemoteException {
+	//		// TODO Auto-generated method stub
+	//		
+	//		
+	//		return null;
+	//	}
+
 	public void exportServer() throws Exception
 	{
 		Remote objremote1 = UnicastRemoteObject.exportObject(this,2020);
@@ -88,10 +152,60 @@ public class RMIServer implements StudentInterface, AdminInterface {
 	}
 
 	@Override
-	public String getNonReturners(String AdminUsername, String strPassword,
-			String InstitutionName, int NumDays) throws RemoteException {
+	public String getNonReturners(String AdminUsername, String AdminPassword,String InstitutionName, int NumDays) throws RemoteException 
+	{
+		StringBuilder sbStudentList = null;
+		sbStudentList.append(instituteName+": \n");
 		// TODO Auto-generated method stub
+		if(AdminUsername.equalsIgnoreCase("admin")&&AdminPassword.equals("admin"))
+		{
+			Iterator<?> it = tableStudents.entrySet().iterator();
+			while(it.hasNext())
+			{
+				Map.Entry pair = (Map.Entry)it.next();
+				ArrayList<Student> listStudent = (ArrayList<Student>) pair.getValue();
+				if(!listStudent.isEmpty())
+				{					
+					for(Student objStudent : listStudent)
+					{
+						if(!objStudent.getReservedBooks().isEmpty())
+						{
+							Iterator<?> innerIterator = objStudent.getReservedBooks().entrySet().iterator();
+							while(innerIterator.hasNext())
+							{
+								Map.Entry innerPair = (Map.Entry)innerIterator.next();
+								
+								if((int)innerPair.getValue()<=(14-NumDays))
+								{
+									sbStudentList.append(objStudent.getFirstName() +" "+objStudent.getLastName()+" "+objStudent.getPhoneNumber()+"\n");
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		return null;
 	}
 
+	private Student getStudent(String strUserName)
+	{
+		Student objStudent = null;
+		ArrayList<Student> listStudent = tableStudents.get(strUserName.charAt(0));
+		synchronized(tableStudents)
+		{
+			if(listStudent.size()>0)
+			{
+				for(Student student : listStudent)
+				{
+					if(student.getUserName().equals(strUserName))
+					{
+						objStudent = student;
+					}
+				}
+			}
+		}
+		return objStudent;
+	}
+	
 }

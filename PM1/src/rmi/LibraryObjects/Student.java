@@ -1,5 +1,6 @@
 package rmi.LibraryObjects;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Student 
@@ -11,6 +12,8 @@ public class Student
 	private String userName; 
 	private String password; 
 	private String institute;
+	private HashMap<Book,Integer> listReservedBooks;
+	private int iFinesAccumulated;
 	
 	//ArrayList<Borrow> borrowList = new ArrayList<Borrow>();
 			
@@ -68,6 +71,22 @@ public class Student
 
 	public void setInst(String inst) {
 		this.institute = inst;
+	}
+	
+	public HashMap<Book,Integer> getReservedBooks() {
+		return listReservedBooks;
+	}
+
+	public void setReservedBooks(HashMap<Book,Integer> listReservedBooks) {
+		this.listReservedBooks = listReservedBooks;
+	}
+	
+	public int getFinesAccumulated() {
+		return iFinesAccumulated;
+	}
+
+	public void setFinesAccumulated(int  iFinesAccumulated) {
+		this.iFinesAccumulated = iFinesAccumulated;
 	}
 	
 	public Student(String userName, String password, String inst)
