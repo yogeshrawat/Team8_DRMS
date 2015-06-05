@@ -27,40 +27,40 @@ import java.util.logging.SimpleFormatter;
 
 public class RMIServer extends Thread implements StudentInterface, AdminInterface {
 
-	private static HashMap<Character, ArrayList<Student>> tableStudents = new HashMap<Character, ArrayList<Student>>();
+	private HashMap<Character, ArrayList<Student>> tableStudents = new HashMap<Character, ArrayList<Student>>();
 	//private static ArrayList<List<Student>> listStudents = new ArrayList<List<Student>>(); 
 	private HashMap<String, Book> tableBooks   = new HashMap<String, Book>();
 	private String instituteName;
 	private int udpPort;
 	private static ArrayList<RMIServer> LibraryServers = null;
-	
+
 	private Logger logger;
-	
+
 	public RMIServer(String instituteName)
 	{
 		this.instituteName = instituteName;
 		this.setLogger("logs/library/"+instituteName+".txt");
 	}
-	
+
 	public RMIServer(){
-		
+
 	}
-	
+
 	private void setLogger(String instituteName) {
 		try{
 			this.logger = Logger.getLogger(this.instituteName);
 			FileHandler fileTxt 	 = new FileHandler(instituteName);
 			SimpleFormatter formatterTxt = new SimpleFormatter();
-		    fileTxt.setFormatter(formatterTxt);
-		    logger.addHandler(fileTxt);
+			fileTxt.setFormatter(formatterTxt);
+			logger.addHandler(fileTxt);
 		}
 		catch(Exception err) {
 			System.out.println("Couldn't Initiate Logger. Please check file permission");
 		}
 	}
 
-	
-	
+
+
 	public int getUDPPort()
 	{
 		return this.udpPort;
@@ -73,57 +73,57 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	}
 
 	public static void main(String[] args) throws RemoteException, AlreadyBoundException {
-		
+
 		// TODO Auto-generated method stub
 		int rmiRegistryPort = 1099;
 		Registry rmiRegistry = LocateRegistry.createRegistry(rmiRegistryPort);
-		
+
 		RMIServer Server1 = new RMIServer("Concordia",50001);
 		RMIServer Server2 = new RMIServer("Ottawa",50002);
 		RMIServer Server3 = new RMIServer("Waterloo",50003);
-		
+
 		Remote objremote1 = UnicastRemoteObject.exportObject(Server1,rmiRegistryPort);
 		rmiRegistry.bind("Concordia", objremote1);
-		
+
 		Remote objremote2 = UnicastRemoteObject.exportObject(Server2,rmiRegistryPort);
 		rmiRegistry.bind("Ottawa", objremote2);
-		
+
 		Remote objremote3 = UnicastRemoteObject.exportObject(Server3,rmiRegistryPort);
 		rmiRegistry.bind("Waterloo", objremote3);
-		
+
 		Server1.start();
 		System.out.println("Concordia server up and running!");
 		Server2.start();
 		System.out.println("Ottawa server up and running!");
 		Server3.start();
 		System.out.println("Waterloo server up and running!");
-		
+
 		addData(Server1);
 		addData(Server2);
 		addData(Server3);
-		
+
 		LibraryServers = new ArrayList<RMIServer>();
 		LibraryServers.add(Server1);
 		LibraryServers.add(Server2);
 		LibraryServers.add(Server3);
-		
-		
-		
-//		try
-//		{
-//			(new RMIServer()).exportServer();
-//			System.out.println("Server is up and running!");
-//			
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-		
-		
-		
+
+
+
+		//		try
+		//		{
+		//			(new RMIServer()).exportServer();
+		//			System.out.println("Server is up and running!");
+		//			
+		//		}
+		//		catch(Exception e)
+		//		{
+		//			e.printStackTrace();
+		//		}
+
+
+
 	}
-	
+
 	private static int i=1;
 	public static void addData(RMIServer server) throws RemoteException
 	{
@@ -131,21 +131,21 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 			Book book = new Book("Book"+j, "Author"+j, 10);
 			server.tableBooks.put(book.getName(), book);
 		}
-		
-		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "123456", ""+i, "abcd", server.instituteName);
+
+		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "123456", "Student"+i, "abcd", server.instituteName);
 		i++;
 	}
 
 	public void run()
 	{
 		DatagramSocket socket = null;
-		
+
 		try
 		{
 			socket = new DatagramSocket(this.udpPort);
 			byte[] msg = new byte[10000];
 			//Logger call
-			
+
 			while(true)
 			{
 				DatagramPacket request = new DatagramPacket(msg, msg.length);
@@ -165,7 +165,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 			socket.close();
 		}
 	}
-	
+
 	@Override
 	public boolean createAccount(String strFirstName, String strLastName, String strEmailAddress, String strPhoneNumber, String strUsername,
 			String strPassword, String strEducationalInstitution)
@@ -215,6 +215,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 							(objStudent.getReservedBooks()).put(objBook,14);//Add Book to Student's reserved list for 14 days
 							success = true;
 							logger.info(strUsername+": Reserved the book "+strBookName+"\n. Remaining copies of"+ strBookName+"is/are"+objBook.getNumOfCopy());
+							System.out.println(this.instituteName +" Library : "+strUsername+": Reserved the book "+strBookName+"\n. Remaining copies of"+ strBookName+"is/are"+objBook.getNumOfCopy());
 
 						}
 						else
@@ -247,20 +248,23 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		// TODO Auto-generated method stub
 		int login = 0;
 		Student objStudent = null;
-		ArrayList<Student> listStudent = tableStudents.get(strUsername.charAt(0));
-		if(listStudent.size()>0)
+		ArrayList<Student> listStudent = this.tableStudents.get(strUsername.charAt(0));
+		if(listStudent!=null)
 		{
-			for(Student student : listStudent)
+			if(listStudent.size()>0)
 			{
-				if(student.getUserName().equals(strUsername))
+				for(Student student : listStudent)
 				{
-					if(student.getPassword().equals(strPassword))
+					if(student.getUserName().equals(strUsername))
 					{
-						login =1;
-					}
-					else
-					{
-						login = 2;
+						if(student.getPassword().equals(strPassword))
+						{
+							login =1;
+						}
+						else
+						{
+							login = 2;
+						}
 					}
 				}
 			}
@@ -306,7 +310,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 							int ServerPort = Server.getUDPPort();
 							DatagramPacket request = new DatagramPacket(msgOut, (""+NumDays).length(),host,ServerPort);
 							socket.send(request);
-							
+
 							byte[] msgIn = new byte[10000];
 							DatagramPacket reply = new DatagramPacket(msgIn, msgIn.length);
 							socket.receive(reply);
@@ -334,34 +338,34 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		StringBuilder sbStudentList = null;
 		sbStudentList.append(instituteName+": \n");
 		// TODO Auto-generated method stub
-			Iterator<?> it = tableStudents.entrySet().iterator();
-			while(it.hasNext())
-			{
-				Map.Entry pair = (Map.Entry)it.next();
-				ArrayList<Student> listStudent = (ArrayList<Student>) pair.getValue();
-				if(!listStudent.isEmpty())
-				{					
-					for(Student objStudent : listStudent)
+		Iterator<?> it = tableStudents.entrySet().iterator();
+		while(it.hasNext())
+		{
+			Map.Entry pair = (Map.Entry)it.next();
+			ArrayList<Student> listStudent = (ArrayList<Student>) pair.getValue();
+			if(!listStudent.isEmpty())
+			{					
+				for(Student objStudent : listStudent)
+				{
+					if(!objStudent.getReservedBooks().isEmpty())
 					{
-						if(!objStudent.getReservedBooks().isEmpty())
+						Iterator<?> innerIterator = objStudent.getReservedBooks().entrySet().iterator();
+						while(innerIterator.hasNext())
 						{
-							Iterator<?> innerIterator = objStudent.getReservedBooks().entrySet().iterator();
-							while(innerIterator.hasNext())
+							Map.Entry innerPair = (Map.Entry)innerIterator.next();
+
+							if((int)innerPair.getValue()<=(14-NumDays))
 							{
-								Map.Entry innerPair = (Map.Entry)innerIterator.next();
-								
-								if((int)innerPair.getValue()<=(14-NumDays))
-								{
-									sbStudentList.append(objStudent.getFirstName() +" "+objStudent.getLastName()+" "+objStudent.getPhoneNumber()+"\n");
-								}
+								sbStudentList.append(objStudent.getFirstName() +" "+objStudent.getLastName()+" "+objStudent.getPhoneNumber()+"\n");
 							}
 						}
 					}
 				}
 			}
+		}
 		return sbStudentList.toString();
 	}
-	
+
 	private Student getStudent(String strUserName)
 	{
 		Student objStudent = null;
@@ -381,5 +385,5 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		}
 		return objStudent;
 	}
-	
+
 }

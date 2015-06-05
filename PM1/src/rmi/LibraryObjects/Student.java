@@ -94,5 +94,6 @@ public class Student
 		this.userName = userName;
 		this.password = password;
 		this.institute	  = inst;
+		listReservedBooks = new HashMap<Book,Integer>();
 	}
 }
