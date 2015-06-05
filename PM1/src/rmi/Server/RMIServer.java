@@ -98,10 +98,16 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		Server3.start();
 		System.out.println("Waterloo server up and running!");
 		
+		addData(Server1);
+		addData(Server2);
+		addData(Server3);
+		
 		LibraryServers = new ArrayList<RMIServer>();
 		LibraryServers.add(Server1);
 		LibraryServers.add(Server2);
 		LibraryServers.add(Server3);
+		
+		
 		
 //		try
 //		{
@@ -116,6 +122,18 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		
 		
 		
+	}
+	
+	private static int i=1;
+	public static void addData(RMIServer server) throws RemoteException
+	{
+		for(int j=1; j<10; j++) { 
+			Book book = new Book("Book"+j, "Author"+j, 10);
+			server.tableBooks.put(book.getName(), book);
+		}
+		
+		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "123456", ""+i, "abcd", server.instituteName);
+		i++;
 	}
 
 	public void run()
