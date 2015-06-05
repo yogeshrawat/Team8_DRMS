@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import javax.management.remote.rmi.RMIIIOPServerImpl;
 
+import Utility.ValidateInput;
 import rmi.Interface.StudentInterface;
 
 public class StudentClient extends Client{
@@ -112,11 +113,12 @@ public class StudentClient extends Client{
 					System.out.println("Email: ");
 					String emailAddress = objClient.InputStringValidation(keyboard);
 					System.out.println("Phone No: ");
-					String phoneNumber = objClient.InputStringValidation(keyboard);
+					ValidateInput v = new ValidateInput();					
+					String phoneNumber = v.validatePhNo(keyboard.toString());;
 					System.out.println("User Name: ");
-					userName = objClient.InputStringValidation(keyboard);
+					userName = 	v.validateUserName(keyboard.toString());
 					System.out.println("Password: ");
-					password = objClient.InputStringValidation(keyboard);
+					password = v.validate(keyboard.toString());
 					//System.out.println("Institution Name: ");
 					institution= objClient.InputStringValidation(keyboard);
 					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, objClient.instituteName);
