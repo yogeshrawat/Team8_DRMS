@@ -125,10 +125,12 @@ public class StudentClient extends Client{
 					if(success){
 						System.out.println("Success");
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						File f = new File("logs/students/"+userName+".txt");
 						objClient.logger.info("Account created successfully for user "+userName);
 					}
 					else{
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						File f = new File("logs/students/"+userName+".txt");
 						objClient.logger.info("Account could not be created for : "+userName);
 					}					
 					break;
