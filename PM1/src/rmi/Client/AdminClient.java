@@ -5,9 +5,68 @@ import java.rmi.RMISecurityManager;
 import java.util.Scanner;
 
 import rmi.Interface.AdminInterface;
+import rmi.Interface.StudentInterface;
 
 public class AdminClient extends Client {
 	
+	static AdminInterface ConcordiaServer;
+	static AdminInterface OttawaServer;
+	static AdminInterface WaterlooServer;
+	static final String Concordia ="Concordia", Ottawa="Ottawa", Waterloo="Waterloo";
+	protected static String instituteName;
+	
+	public void InitializeServer() throws Exception {
+		System.setSecurityManager(new RMISecurityManager());
+		ConcordiaServer = (AdminInterface)Naming.lookup("rmi://localhost:1099/Concordia");		
+		OttawaServer = (AdminInterface)Naming.lookup("rmi://localhost:1099/Ottawa");
+		WaterlooServer = (AdminInterface)Naming.lookup("rmi://localhost:1099/Waterloo");	
+	}
+	
+	public AdminInterface ServerValidation(Scanner keyboard)
+	{
+		Boolean valid = false;
+		AdminInterface server = null;
+		System.out.println("Enter Institute Name");
+		System.out.println("'Concordia' For Concordia University");
+		System.out.println("'Ottawa' For Ottawa University");
+		System.out.println("'Waterloo' For Waterloo University");
+		while(!valid)
+		{
+			try{
+				instituteName = keyboard.nextLine();
+				server = LocateServer(instituteName);
+				if(server != null) {
+					valid=true;
+				}
+				else {
+					System.out.println("Invalid Institute Name");
+					keyboard.nextLine();
+				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("Invalid Institute Name");
+				valid=false;
+				keyboard.nextLine();
+			}
+		}
+		//keyboard.nextLine();
+		return server;
+	}
+	
+	//Get Server Connection
+	public static AdminInterface LocateServer(String instituteName) {
+		if(instituteName.equals(Concordia)) {
+			return ConcordiaServer;
+		}
+		else if(instituteName.equals(Ottawa)) {
+			return OttawaServer;
+		}
+		else if(instituteName.equals(Waterloo)) {
+			return WaterlooServer;
+		}
+		return null;
+	}
 
 	public static void showMenu()
 	{
@@ -17,19 +76,16 @@ public class AdminClient extends Client {
 		System.out.println("2. Exit");
 	}
 	
-
-	
 	public static void main(String[] args)
 	{
 		try{
-
 			AdminClient objClient = new AdminClient();
 			//initialize the connections to registry
 			objClient.InitializeServer();
 			AdminInterface objServer = null;
 			Scanner keyboard = new Scanner(System.in);
 			//to which server you want to connect
-			objServer = (AdminInterface) objClient.ServerValidation(keyboard);
+			objServer = objClient.ServerValidation(keyboard);
 			Integer userInput = 0;
 			showMenu();
 			objClient.setLogger("admin", "logs/admin.txt");

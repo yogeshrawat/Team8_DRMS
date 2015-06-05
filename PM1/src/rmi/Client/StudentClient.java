@@ -12,6 +12,64 @@ import rmi.Interface.StudentInterface;
 
 public class StudentClient extends Client{
 
+	static StudentInterface ConcordiaServer;
+	static StudentInterface OttawaServer;
+	static StudentInterface WaterlooServer;
+	static final String Concordia ="Concordia", Ottawa="Ottawa", Waterloo="Waterloo";
+	protected static String instituteName;
+	
+	public void InitializeServer() throws Exception {
+		System.setSecurityManager(new RMISecurityManager());
+		ConcordiaServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Concordia");		
+		OttawaServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Ottawa");
+		WaterlooServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Waterloo");	
+	}
+	
+	public StudentInterface ServerValidation(Scanner keyboard)
+	{
+		Boolean valid = false;
+		StudentInterface server = null;
+		System.out.println("Enter Institute Name");
+		System.out.println("'Concordia' For Concordia University");
+		System.out.println("'Ottawa' For Ottawa University");
+		System.out.println("'Waterloo' For Waterloo University");
+		while(!valid)
+		{
+			try{
+				instituteName = keyboard.nextLine();
+				server = LocateServer(instituteName);
+				if(server != null) {
+					valid=true;
+				}
+				else {
+					System.out.println("Invalid Institute Name");
+					keyboard.nextLine();
+				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("Invalid Institute Name");
+				valid=false;
+				keyboard.nextLine();
+			}
+		}
+		//keyboard.nextLine();
+		return server;
+	}
+	
+	//Get Server Connection
+	public static StudentInterface LocateServer(String instituteName) {
+		if(instituteName.equals(Concordia)) {
+			return ConcordiaServer;
+		}
+		else if(instituteName.equals(Ottawa)) {
+			return OttawaServer;
+		}
+		else if(instituteName.equals(Waterloo)) {
+			return WaterlooServer;
+		}
+		return null;
+	}
 	
 	//Menu to display actions that are need to perform by student
 	public static void showMenu()
@@ -22,8 +80,6 @@ public class StudentClient extends Client{
 		System.out.println("2. Reserve a Book");
 		System.out.println("3. Exit");
 	}
-	
-
 	
 	public static void main(String[] args)
 	{
@@ -63,12 +119,11 @@ public class StudentClient extends Client{
 					password = objClient.InputStringValidation(keyboard);
 					//System.out.println("Institution Name: ");
 					institution= objClient.InputStringValidation(keyboard);
-					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, Client.instituteName);
+					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, objClient.instituteName);
 					if(success){
 						System.out.println("Success");
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
 						objClient.logger.info("Account created successfully for user "+userName);
-
 					}
 					else{
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
@@ -89,7 +144,6 @@ public class StudentClient extends Client{
 						System.out.println("Success");
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
 						objClient.logger.info("Account created successfully for user "+userName);
-
 					}
 					else{
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");

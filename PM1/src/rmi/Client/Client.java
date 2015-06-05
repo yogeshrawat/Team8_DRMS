@@ -11,12 +11,6 @@ import rmi.Interface.StudentInterface;
 
 public class Client {
 	
-	static StudentInterface ConcordiaServer;
-	static StudentInterface OttawaServer;
-	static StudentInterface WaterlooServer;
-	static final String Concordia ="Concordia", Ottawa="Ottawa", Waterloo="Waterloo";
-	//static final String Institution = "Institution";
-	protected static String instituteName;
 	protected Logger logger;
 
 	public void setLogger(String username, String fileName) {
@@ -31,62 +25,6 @@ public class Client {
 			System.out.println("Couldn't create Logger. Please check file permission");
 		}
 	}
-	
-	public void InitializeServer() throws Exception {
-		System.setSecurityManager(new RMISecurityManager());
-		ConcordiaServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Concordia");		
-		OttawaServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Ottawa");
-		WaterlooServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Waterloo");	
-	}
-	
-	public StudentInterface ServerValidation(Scanner keyboard)
-	{
-		Boolean valid = false;
-		StudentInterface server = null;
-		System.out.println("Enter Institute Name");
-		System.out.println("'Concordia' For Concordia University");
-		System.out.println("'Ottawa' For Ottawa University");
-		System.out.println("'Waterloo' For Waterloo University");
-		while(!valid)
-		{
-			try{
-				instituteName = keyboard.nextLine();
-				server = LocateServer(instituteName);
-				if(server != null) {
-					valid=true;
-				}
-				else {
-					System.out.println("Invalid Institute Name");
-					keyboard.nextLine();
-				}
-			}
-			catch(Exception e)
-			{
-				System.out.println("Invalid Institute Name");
-				valid=false;
-				keyboard.nextLine();
-			}
-		}
-		//keyboard.nextLine();
-		return server;
-	}
-
-	
-	//Get Server Connection
-	public static StudentInterface LocateServer(String instituteName) {
-		if(instituteName.equals(Concordia)) {
-			return ConcordiaServer;
-		}
-		else if(instituteName.equals(Ottawa)) {
-			return OttawaServer;
-		}
-		else if(instituteName.equals(Waterloo)) {
-			return WaterlooServer;
-		}
-		return null;
-	}
-
-
 	
 	public String InputStringValidation(Scanner keyboard) {
 		Boolean valid = false;
@@ -106,7 +44,6 @@ public class Client {
 		}
 		return userInput;
 	}
-	
 	
 	public int InputIntValidation(Scanner keyboard) {
 		Boolean valid = false;
