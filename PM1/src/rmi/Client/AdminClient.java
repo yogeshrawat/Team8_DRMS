@@ -79,6 +79,7 @@ public class AdminClient extends Client {
 	public static void main(String[] args)
 	{
 		try{
+			System.setProperty("java.security.policy","file:./security.policy");
 			AdminClient objClient = new AdminClient();
 			//initialize the connections to registry
 			objClient.InitializeServer();
