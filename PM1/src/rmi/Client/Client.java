@@ -14,8 +14,8 @@ public class Client {
 	static StudentInterface ConcordiaServer;
 	static StudentInterface OttawaServer;
 	static StudentInterface WaterlooServer;
-	static final String Concordia ="concordia", Ottawa="ottawa", Waterloo="waterloo";
-	static final String Institution = "Institution";
+	static final String Concordia ="Concordia", Ottawa="Ottawa", Waterloo="Waterloo";
+	//static final String Institution = "Institution";
 	protected static String instituteName;
 	protected Logger logger;
 
@@ -34,9 +34,9 @@ public class Client {
 	
 	public void InitializeServer() throws Exception {
 		System.setSecurityManager(new RMISecurityManager());
-		ConcordiaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);		
-		OttawaServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);
-		WaterlooServer = (StudentInterface)Naming.lookup("rmi://127.0.0.1:2020/"+Institution);	
+		ConcordiaServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Concordia");		
+		OttawaServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Ottawa");
+		WaterlooServer = (StudentInterface)Naming.lookup("rmi://localhost:1099/Waterloo");	
 	}
 	
 	public StudentInterface ServerValidation(Scanner keyboard)
@@ -44,9 +44,9 @@ public class Client {
 		Boolean valid = false;
 		StudentInterface server = null;
 		System.out.println("Enter Institute Name");
-		System.out.println("'concordia' For Concordia University");
-		System.out.println("'ottawa' For Ottawa University");
-		System.out.println("'waterloo' For Waterloo University");
+		System.out.println("'Concordia' For Concordia University");
+		System.out.println("'Ottawa' For Ottawa University");
+		System.out.println("'Waterloo' For Waterloo University");
 		while(!valid)
 		{
 			try{

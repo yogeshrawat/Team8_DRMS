@@ -28,7 +28,7 @@ public class StudentClient extends Client{
 	public static void main(String[] args)
 	{
 		try{
-			
+			System.setProperty("java.security.policy","file:./security.policy");
 			StudentClient objClient = new StudentClient();
 			//initialize the connections to registry
 			objClient.InitializeServer();
@@ -37,14 +37,15 @@ public class StudentClient extends Client{
 			//to which server you want to connect
 			objServer = objClient.ServerValidation(keyboard);
 			Integer userInput = 0;
-			showMenu();
-
-			userInput = Integer.parseInt(objClient.InputStringValidation(keyboard));
+			
 			String userName, password, institution;
 			boolean success = false;
 
 			while(true)
 			{
+				showMenu();
+
+				userInput = Integer.parseInt(objClient.InputStringValidation(keyboard));
 				switch(userInput)
 				{
 				case 1: 
@@ -60,9 +61,9 @@ public class StudentClient extends Client{
 					userName = objClient.InputStringValidation(keyboard);
 					System.out.println("Password: ");
 					password = objClient.InputStringValidation(keyboard);
-					System.out.println("Institution Name: ");
+					//System.out.println("Institution Name: ");
 					institution= objClient.InputStringValidation(keyboard);
-					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, instituteName);
+					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, Client.instituteName);
 					if(success){
 						System.out.println("Success");
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
@@ -72,8 +73,7 @@ public class StudentClient extends Client{
 					else{
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
 						objClient.logger.info("Account could not be created for : "+userName);
-					}
-					showMenu();
+					}					
 					break;
 				case 2: 
 					System.out.println("User Name: ");
@@ -95,8 +95,7 @@ public class StudentClient extends Client{
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
 						objClient.logger.info("Account could not be created for : "+userName);
 
-					}
-					showMenu();
+					}					
 					break;
 				case 3: 
 					showMenu();

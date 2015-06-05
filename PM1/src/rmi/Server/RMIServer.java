@@ -32,7 +32,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	private HashMap<String, Book> tableBooks   = new HashMap<String, Book>();
 	private String instituteName;
 	private int udpPort;
-	private static ArrayList<RMIServer> LibraryServers;
+	private static ArrayList<RMIServer> LibraryServers = null;
 	
 	private Logger logger;
 	
@@ -69,7 +69,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		// TODO Auto-generated constructor stub
 		instituteName = strInstitution;
 		udpPort = iPortNum;
-		//this.setlogger(//LogFilePath);
+		this.setLogger("logs/library/"+instituteName+".txt");
 	}
 
 	public static void main(String[] args) throws RemoteException, AlreadyBoundException {
@@ -85,16 +85,20 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		Remote objremote1 = UnicastRemoteObject.exportObject(Server1,rmiRegistryPort);
 		rmiRegistry.bind("Concordia", objremote1);
 		
-		Remote objremote2 = UnicastRemoteObject.exportObject(Server1,rmiRegistryPort);
+		Remote objremote2 = UnicastRemoteObject.exportObject(Server2,rmiRegistryPort);
 		rmiRegistry.bind("Ottawa", objremote2);
 		
-		Remote objremote3 = UnicastRemoteObject.exportObject(Server1,rmiRegistryPort);
+		Remote objremote3 = UnicastRemoteObject.exportObject(Server3,rmiRegistryPort);
 		rmiRegistry.bind("Waterloo", objremote3);
 		
 		Server1.start();
+		System.out.println("Concordia server up and running!");
 		Server2.start();
+		System.out.println("Ottawa server up and running!");
 		Server3.start();
+		System.out.println("Waterloo server up and running!");
 		
+		LibraryServers = new ArrayList<RMIServer>();
 		LibraryServers.add(Server1);
 		LibraryServers.add(Server2);
 		LibraryServers.add(Server3);
