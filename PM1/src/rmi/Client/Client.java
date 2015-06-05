@@ -20,6 +20,8 @@ public class Client {
 			SimpleFormatter formatterTxt = new SimpleFormatter();
 		    fileTxt.setFormatter(formatterTxt);
 		    logger.addHandler(fileTxt);
+			logger.setUseParentHandlers(false);
+
 		}
 		catch(Exception err) {
 			System.out.println("Couldn't create Logger. Please check file permission");
