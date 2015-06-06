@@ -150,6 +150,7 @@ public class StudentClient extends Client{
 					
 					
 						institution= getEducationalInstituteFromUser();
+						objClient.InitializeServer();
 						objServer = objClient.ServerValidation(institution);
 						int loginResult = objServer.checkUser(userName, password, institution);
 						switch(loginResult)
@@ -158,15 +159,23 @@ public class StudentClient extends Client{
 						
 						case 0: System.out.println("You are not registered with "+institution);
 						System.out.println("Press 1 to continue 0 to Exit.");
-						if(objClient.InputIntValidation(keyboard)==1)
+						int in1 = objClient.InputIntValidation(keyboard);
+						if(in1==1)
+						{							
 							break;
+						}
 						else
 							System.exit(0);
 						
 						case 2: System.out.println("Invalid Password. Please try again");
 						System.out.println("Press 1 to continue 0 to Exit.");
-						if(objClient.InputIntValidation(keyboard)==1)
+						int in2 = objClient.InputIntValidation(keyboard);
+						if(in2 == 1)
+						{
+							keyboard=null;
 							break;
+						}
+							
 						else
 							System.exit(0);
 						}
