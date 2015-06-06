@@ -175,11 +175,11 @@ public class StudentClient extends Client{
 					if(success){
 						System.out.println("Success");
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
-						objClient.logger.info("Account created successfully for user "+userName);
+						objClient.logger.info("Book reserved successfully for user "+userName);
 					}
 					else{
 						objClient.setLogger(userName, "logs/students/"+userName+".txt");
-						objClient.logger.info("Account could not be created for : "+userName);
+						objClient.logger.info("Book could not be reserved for : "+userName);
 
 					}					
 					break;

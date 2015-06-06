@@ -110,8 +110,9 @@ public class AdminClient extends Client {
 					//TODO what to do with institute name
 					
 					objClient.logger.info("Non Returner retrieved on :"+ System.currentTimeMillis());
-					objServer.getNonReturners(userName, password, objServer.toString(), numOfDays);
-
+					String result = "";
+					result = objServer.getNonReturners(userName, password, objServer.toString(), numOfDays);
+					System.out.println(result);
 					showMenu();
 					break;
 				case 2:

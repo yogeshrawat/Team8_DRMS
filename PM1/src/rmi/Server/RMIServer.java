@@ -249,6 +249,8 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		int login = 0;
 		Student objStudent = null;
 		ArrayList<Student> listStudent = this.tableStudents.get(strUsername.charAt(0));
+		if(listStudent!=null)
+		{
 		if(listStudent.size()>0)
 		{
 			for(Student student : listStudent)
@@ -266,7 +268,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 				}
 			}
 		}
-
+		}
 		return login;
 	}
 
@@ -332,7 +334,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 
 	private String GetNonReturnersByServer(int NumDays)
 	{
-		StringBuilder sbStudentList = null;
+		StringBuilder sbStudentList = new StringBuilder();
 		sbStudentList.append(instituteName+": \n");
 		// TODO Auto-generated method stub
 			Iterator<?> it = tableStudents.entrySet().iterator();
