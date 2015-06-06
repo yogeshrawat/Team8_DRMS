@@ -34,7 +34,7 @@ public class Test4 {
 		StudentClient s = new StudentClient();
 		//a.InitializeServer();
 		
-		assertNotNull(s.LocateServer("Concordia"));
+//		assertNotNull(s.LocateServer("Concordia"));
 		assertNull(s.LocateServer("Mcgill"));
 		
 		
