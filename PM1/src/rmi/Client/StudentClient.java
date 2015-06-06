@@ -112,12 +112,14 @@ public class StudentClient extends Client{
 					String lastName = objClient.InputStringValidation(keyboard);
 					System.out.println("Email: ");
 					String emailAddress = objClient.InputStringValidation(keyboard);
+
 					System.out.println("Phone No: ");
-					String phoneNumber = objClient.InputStringValidation(keyboard);
+					ValidateInput v = new ValidateInput();	
+					String phoneNumber = v.validatePhNo(keyboard.toString());
 					System.out.println("User Name: ");
-					userName = objClient.InputStringValidation(keyboard);
+					userName = v.validateUserName(keyboard.toString());
 					System.out.println("Password: ");
-					password = objClient.InputStringValidation(keyboard);
+					password = v.validate(keyboard.toString());
 					institution= getEducationalInstituteFromUser();
 					objServer = objClient.ServerValidation(institution);
 					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, objClient.instituteName);
@@ -139,16 +141,16 @@ public class StudentClient extends Client{
 					String authorName = "";
 					while(flag)
 					{
-					System.out.println("User Name: ");
-					userName = objClient.InputStringValidation(keyboard);
-					System.out.println("Password: ");
-					password = objClient.InputStringValidation(keyboard);
-					System.out.println("Book Name: ");
-					bookName = objClient.InputStringValidation(keyboard);
-					System.out.println("Author: ");
-					authorName = objClient.InputStringValidation(keyboard);
-					
-					
+						System.out.println("User Name: ");
+						userName = objClient.InputStringValidation(keyboard);
+						System.out.println("Password: ");
+						password = objClient.InputStringValidation(keyboard);
+						System.out.println("Book Name: ");
+						bookName = objClient.InputStringValidation(keyboard);
+						System.out.println("Author: ");
+						authorName = objClient.InputStringValidation(keyboard);
+
+
 						institution= getEducationalInstituteFromUser();
 						objClient.InitializeServer();
 						objServer = objClient.ServerValidation(institution);
@@ -156,7 +158,7 @@ public class StudentClient extends Client{
 						switch(loginResult)
 						{
 						case 1: System.out.println("Redirecting to "+institution+" server");flag = false; break;
-						
+
 						case 0: System.out.println("You are not registered with "+institution);
 						System.out.println("Press 1 to continue 0 to Exit.");
 						int in1 = objClient.InputIntValidation(keyboard);
@@ -166,7 +168,7 @@ public class StudentClient extends Client{
 						}
 						else
 							System.exit(0);
-						
+
 						case 2: System.out.println("Invalid Password. Please try again");
 						System.out.println("Press 1 to continue 0 to Exit.");
 						int in2 = objClient.InputIntValidation(keyboard);
@@ -175,7 +177,7 @@ public class StudentClient extends Client{
 							keyboard=null;
 							break;
 						}
-							
+
 						else
 							System.exit(0);
 						}
