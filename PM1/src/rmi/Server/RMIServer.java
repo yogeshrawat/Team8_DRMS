@@ -127,13 +127,27 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	private static int i=1;
 	public static void addData(RMIServer server) throws RemoteException
 	{
-		for(int j=1; j<10; j++) { 
+		for(int j=1; j<5; j++) { 
 			Book book = new Book("Book"+j, "Author"+j, 10);
 			server.tableBooks.put(book.getName(), book);
 		}
 
-		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "123456", "Student"+i, "abcd", server.instituteName);
-		i++;
+		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "1234567890", "Student"+i, "abcd", server.instituteName);
+		server.createAccount("yogesh", "rawat","yogesh@gmail.com","5145156743","yogesh","yogesh",server.instituteName);
+		server.createAccount("aron", "engineer","aron@gmail.com","5145156743","aron","aron",server.instituteName);
+		server.createAccount("ashish", "guhe","ashish@gmail.com","5145656743","ashish","ashish",server.instituteName);
+		
+		server.reserveBook("yogesh", "yogesh", "Book1", "Author1");
+		ArrayList<Student> list = server.tableStudents.get('y');
+		
+		Book Book1 = new Book("Book1","Author1",8);
+		for(Student student : list)
+		{
+			if(student.getUserName().equals("yogesh"))
+			{
+				student.getReservedBooks().put(Book1, 2);
+			}
+		}
 	}
 
 	public void run()
@@ -185,6 +199,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 				tableStudents.put(strUsername.charAt(0), objNewStudent);
 			}
 			objNewStudent.add(objStudent);
+			
 			logger.info("New User added to the library with username as : "+objStudent.getUserName());
 
 		}
