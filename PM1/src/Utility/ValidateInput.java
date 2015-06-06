@@ -66,12 +66,14 @@ public class ValidateInput {
 	
 	public static void main(String[] argv) {
 		ValidateInput vphno=new ValidateInput();
-		System.out.println("enter username and password :");
+		System.out.println("enter username an :");
 		Scanner keyboard = new Scanner(System.in);
 		String m_username= keyboard.next();
+		System.out.println(vphno.validateUserName(m_username));
+		System.out.println("enter passowrd an :");
+
 		String m_password= keyboard.next();
 		//vphno.validate(m_password);
-		System.out.println(vphno.validateUserName(m_username));
 		System.out.println(vphno.validate(m_password));
 		}
 }

@@ -115,11 +115,11 @@ public class StudentClient extends Client{
 
 					System.out.println("Phone No: ");
 					ValidateInput v = new ValidateInput();	
-					String phoneNumber = v.validatePhNo(keyboard.toString());
+					String phoneNumber = v.validatePhNo(keyboard.nextLine().toString());
 					System.out.println("User Name: ");
-					userName = v.validateUserName(keyboard.toString());
+					userName = v.validateUserName(keyboard.nextLine().toString());
 					System.out.println("Password: ");
-					password = v.validate(keyboard.toString());
+					password = v.validate(keyboard.nextLine().toString());
 					institution= getEducationalInstituteFromUser();
 					objServer = objClient.ServerValidation(institution);
 					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, objClient.instituteName);
