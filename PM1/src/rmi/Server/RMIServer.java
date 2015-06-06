@@ -132,9 +132,9 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 			server.tableBooks.put(book.getName(), book);
 		}
 
-		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "1234567890", "Student"+i, "abcd", server.instituteName);
+		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "1234567890", "Student"+i, "abc123", server.instituteName);
 		server.createAccount("yogesh", "rawat","yogesh@gmail.com","5145156743","yogesh","yogesh",server.instituteName);
-		server.createAccount("aron", "engineer","aron@gmail.com","5145156743","aron","aron",server.instituteName);
+		server.createAccount("aron", "engineer","aron@gmail.com","5145156743","aron123","aron123",server.instituteName);
 		server.createAccount("ashish", "guhe","ashish@gmail.com","5145656743","ashish","ashish",server.instituteName);
 		
 		server.reserveBook("yogesh", "yogesh", "Book1", "Author1");

@@ -139,12 +139,13 @@ public class StudentClient extends Client{
 					boolean flag = true;
 					String bookName = "";
 					String authorName = "";
+					ValidateInput v2 = new ValidateInput();	
 					while(flag)
 					{
 						System.out.println("User Name: ");
-						userName = objClient.InputStringValidation(keyboard);
+						userName = v2.validateUserName(keyboard.nextLine().toString());
 						System.out.println("Password: ");
-						password = objClient.InputStringValidation(keyboard);
+						password = v2.validate(keyboard.nextLine().toString());
 						System.out.println("Book Name: ");
 						bookName = objClient.InputStringValidation(keyboard);
 						System.out.println("Author: ");
