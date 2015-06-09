@@ -196,11 +196,9 @@ public class StudentClient extends Client{
 					}					
 					break;
 				case 3: 
-					showMenu();
-					break;
-				case 4: 
-					showMenu();
-					break;
+					System.out.println("Have a nice day!");
+					keyboard.close();
+					System.exit(0);
 				default:
 					System.out.println("Invalid input");
 				}
