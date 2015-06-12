@@ -185,12 +185,17 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 			String strPassword, String strEducationalInstitution)
 					throws RemoteException
 	{
+		if(isExist(strUsername, strEducationalInstitution )){
+			return false;
+		}
+		else 
+		{
 		Student objStudent = new Student(strUsername,strPassword,strEducationalInstitution);
 		objStudent.setFirstName(strFirstName);
 		objStudent.setLastName(strLastName);
 		objStudent.setEmailAddress(strEmailAddress);
 		objStudent.setPhoneNumber(strPhoneNumber);
-
+		
 		//Add student to HashTable 'tableStudents' with Lock
 		synchronized(tableStudents.get(strUsername.charAt(0))) {
 			ArrayList<Student> objNewStudent = tableStudents.get(strUsername.charAt(0));
@@ -204,6 +209,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 
 		}
 		return true;
+		}
 	}
 
 	@Override
@@ -256,6 +262,30 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		}
 		return success;
 	}
+	
+	
+	public boolean isExist(String strUsername, String strEducationalInstitution) throws RemoteException 
+	{
+		// TODO Auto-generated method stub
+		boolean exist = false;
+		ArrayList<Student> listStudent = new ArrayList<Student>();
+		listStudent = tableStudents.get(strUsername.charAt(0));
+		if(listStudent!=null)
+		{
+			if(listStudent.size()>0)
+			{
+				for(Student student : listStudent)
+				{
+					if(student.getUserName().equals(strUsername))
+					{
+						exist = true;
+					}
+				}
+			}
+		}
+		return exist;
+	}
+
 
 	@Override
 	public int checkUser(String strUsername, String strPassword,String strEducationalInstitution) throws RemoteException 

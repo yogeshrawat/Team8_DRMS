@@ -135,7 +135,7 @@ public class StudentClient extends Client{
 						File fi = new File(".\\logs\\students\\"+userName+".txt");
 						FileWriter fw=new FileWriter(fi);
 						objClient.setLogger(userName, ".\\logs\\students\\"+userName+".txt");
-						objClient.logger.info("Account could not be created for : "+userName);
+						objClient.logger.info("Account already exist with username as : "+userName);
 						fw.close();
 
 					}					
