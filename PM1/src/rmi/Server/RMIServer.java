@@ -192,7 +192,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		objStudent.setPhoneNumber(strPhoneNumber);
 
 		//Add student to HashTable 'tableStudents' with Lock
-		synchronized(tableStudents) {
+		synchronized(tableStudents.get(strUsername.charAt(0))) {
 			ArrayList<Student> objNewStudent = tableStudents.get(strUsername.charAt(0));
 			if(objNewStudent == null) {
 				objNewStudent = new ArrayList<Student>();
@@ -230,7 +230,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 							(objStudent.getReservedBooks()).put(objBook,14);//Add Book to Student's reserved list for 14 days
 							success = true;
 							logger.info(strUsername+": Reserved the book "+strBookName+"\n. Remaining copies of"+ strBookName+"is/are"+objBook.getNumOfCopy());
-							System.out.println(this.instituteName +" Library : "+strUsername+": Reserved the book "+strBookName+"\n. Remaining copies of"+ strBookName+"is/are"+objBook.getNumOfCopy());
+							System.out.println(this.instituteName +" Library : "+strUsername+": Reserved the book "+strBookName+"\n. Remaining copies of "+ strBookName+" is/are "+objBook.getNumOfCopy());
 
 						}
 						else
@@ -385,7 +385,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	{
 		Student objStudent = null;
 		ArrayList<Student> listStudent = tableStudents.get(strUserName.charAt(0));
-		synchronized(tableStudents)
+		synchronized(tableStudents.get(strUserName.charAt(0)))
 		{
 			if(listStudent.size()>0)
 			{

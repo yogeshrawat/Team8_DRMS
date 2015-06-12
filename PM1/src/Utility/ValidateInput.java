@@ -50,7 +50,7 @@ public class ValidateInput {
 	}
 	
 	public String validatePhNo(String m_phoneNumber){
-                Pattern pattern = Pattern.compile("\\d{3}-\\d{7}");
+                Pattern pattern = Pattern.compile("\\d{10}");
                 Matcher matcher = pattern.matcher(m_phoneNumber);
       if (matcher.matches()) {
       	  return m_phoneNumber;

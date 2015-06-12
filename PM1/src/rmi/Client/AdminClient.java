@@ -99,7 +99,7 @@ public class AdminClient extends Client {
 				switch(userInput)
 				{
 				case 1: 
-					System.out.println("User Name: ");
+					System.out.println("Admin userName: ");
 					userName = objClient.InputStringValidation(keyboard);
 					System.out.println("Password: ");
 					password = objClient.InputStringValidation(keyboard);

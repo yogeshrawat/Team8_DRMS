@@ -125,14 +125,19 @@ public class StudentClient extends Client{
 					success = objServer.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, objClient.instituteName);
 					if(success){
 						System.out.println("Success");
-						objClient.setLogger(userName, "logs/students/"+userName+".txt");
-						File f = new File("logs/students/"+userName+".txt");
+						File fi = new File(".\\logs\\students\\"+userName+".txt");
+						FileWriter fw=new FileWriter(fi);
+						objClient.setLogger(userName,".\\logs\\students\\"+userName+".txt");
 						objClient.logger.info("Account created successfully for user "+userName);
+						fw.close();
 					}
 					else{
-						objClient.setLogger(userName, "logs/students/"+userName+".txt");
-						File f = new File("logs/students/"+userName+".txt");
+						File fi = new File(".\\logs\\students\\"+userName+".txt");
+						FileWriter fw=new FileWriter(fi);
+						objClient.setLogger(userName, ".\\logs\\students\\"+userName+".txt");
 						objClient.logger.info("Account could not be created for : "+userName);
+						fw.close();
+
 					}					
 					break;
 				case 2: 
@@ -186,11 +191,11 @@ public class StudentClient extends Client{
 					success = objServer.reserveBook(userName, password, bookName, authorName);
 					if(success){
 						System.out.println("Success");
-						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						objClient.setLogger(userName, ".\\logs\\students\\"+userName+".txt");
 						objClient.logger.info("Book reserved successfully for user "+userName);
 					}
 					else{
-						objClient.setLogger(userName, "logs/students/"+userName+".txt");
+						objClient.setLogger(userName, ".\\logs\\students\\"+userName+".txt");
 						objClient.logger.info("Book could not be reserved for : "+userName);
 
 					}					
