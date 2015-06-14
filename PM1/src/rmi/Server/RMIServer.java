@@ -39,7 +39,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	public RMIServer(String instituteName)
 	{
 		this.instituteName = instituteName;
-		this.setLogger("logs/library/"+instituteName+".txt");
+		this.setLogger(".\\logs\\library\\"+instituteName+".txt");
 	}
 
 	public RMIServer(){
@@ -131,6 +131,12 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 			Book book = new Book("Book"+j, "Author"+j, 10);
 			server.tableBooks.put(book.getName(), book);
 		}
+		
+		ArrayList<Student> s = new ArrayList<Student>();
+		for(char i = 'A'; i <= 'Z' ; i++)
+		{
+			server.tableStudents.putIfAbsent(i, s);
+		}
 
 		server.createAccount("Student"+i, "L"+i, "Student"+i+"@test.com", "1234567890", "Student"+i, "abc123", server.instituteName);
 		server.createAccount("yogesh", "rawat","yogesh@gmail.com","5145156743","yogesh","yogesh",server.instituteName);
@@ -197,6 +203,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 		objStudent.setPhoneNumber(strPhoneNumber);
 		
 		//Add student to HashTable 'tableStudents' with Lock
+		if(tableStudents.get(strUsername.charAt(0)) != null){
 		synchronized(tableStudents.get(strUsername.charAt(0))) {
 			ArrayList<Student> objNewStudent = tableStudents.get(strUsername.charAt(0));
 			if(objNewStudent == null) {
@@ -206,8 +213,21 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 			objNewStudent.add(objStudent);
 			
 			logger.info("New User added to the library with username as : "+objStudent.getUserName());
-
 		}
+		}
+		else {
+			ArrayList<Student> objNewStudent = tableStudents.get(strUsername.charAt(0));
+			if(objNewStudent == null) {
+				objNewStudent = new ArrayList<Student>();
+				tableStudents.put(strUsername.charAt(0), objNewStudent);
+			}
+			objNewStudent.add(objStudent);
+			
+			logger.info("New User added to the library with username as : "+objStudent.getUserName());
+			
+		}
+
+		
 		return true;
 		}
 	}
@@ -249,6 +269,8 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 						System.out.println("Required book not found");	
 					}
 				}
+				
+				
 			}
 			else
 			{
@@ -415,6 +437,7 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 	{
 		Student objStudent = null;
 		ArrayList<Student> listStudent = tableStudents.get(strUserName.charAt(0));
+		if(tableStudents.get(strUserName.charAt(0)) != null){
 		synchronized(tableStudents.get(strUserName.charAt(0)))
 		{
 			if(listStudent.size()>0)
@@ -427,6 +450,20 @@ public class RMIServer extends Thread implements StudentInterface, AdminInterfac
 					}
 				}
 			}
+		}
+		}
+		else {
+			if(listStudent.size()>0)
+			{
+				for(Student student : listStudent)
+				{
+					if(student.getUserName().equals(strUserName))
+					{
+						objStudent = student;
+					}
+				}
+			}
+			
 		}
 		return objStudent;
 	}
